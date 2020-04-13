@@ -114,9 +114,28 @@ parts:
   nextcloud:
     plugin: dump
     source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.1.tar.gz
+    after: [php]
     organize:
       '*': htdocs/
-      '.htaccess': htdocs/.htaccess
+    build-packages:
+      - php-cli
+      - php-zip
+      - unzip
+      - nodejs
+    override-pull: |
+        snapcraftctl pull
+        #Download composer
+        curl -sS https://getcomposer.org/installer -o composer-setup.php
+        ## Install it
+        php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+        composer install --ignore-platform-reqs
+        npm i
+
+        # Dont know - dont care (conflicts with mysql license file ?)
+        mv LICENSE LXD_MOSAIC_LICENSE
+        rsync -arP * $SNAPCRAFT_STAGE/htdocs
+
+
 
   php:
     plugin: php
@@ -146,7 +165,6 @@ parts:
       - --with-freetype-dir=/usr/lib
       - --disable-rpath
       - --enable-ftp
-      # - --with-apxs2=/usr/bin/apxs2
 
       # Enable ldap
       - --with-libdir=lib/$SNAPCRAFT_ARCH_TRIPLET
