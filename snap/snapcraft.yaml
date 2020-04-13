@@ -1,10 +1,8 @@
-name: nextcloud
+name: lxdmosaic
 version: git
-summary: Nextcloud Server - A safe home for all your data
+summary: Manage lxd
 description: |
- Access, share and protect your files, calendars, contacts, communication and
- more at home and in your enterprise.
-
+ yeah yeah
 grade: stable
 confinement: strict
 
@@ -15,7 +13,7 @@ apps:
     stop-command: httpd-wrapper -k stop
     daemon: simple
     restart-condition: always
-    plugs: [network, network-bind, removable-media]
+    plugs: [network, network-bind]
 
   # MySQL daemon
   mysql:
@@ -32,20 +30,6 @@ apps:
     restart-condition: always
     plugs: [network, network-bind, removable-media]
 
-  # redis server daemon
-  redis-server:
-    command: start-redis-server
-    daemon: simple
-    restart-condition: always
-    plugs: [network, network-bind]
-
-  # mDNS daemon
-  mdns-publisher:
-    command: delay-on-failure mdns-publisher nextcloud
-    daemon: simple
-    restart-condition: always
-    plugs: [network, network-bind]
-
   # MySQL client
   mysql-client:
     command: run-mysql
@@ -55,10 +39,6 @@ apps:
     command: mysqldump --defaults-file=$SNAP_DATA/mysql/root.ini --lock-tables nextcloud
     plugs: [network, network-bind]
 
-  # Nextcloud occ command
-  occ:
-    command: occ
-    plugs: [network, network-bind, removable-media]
 
   enable-https:
     command: enable-https
@@ -74,47 +54,20 @@ apps:
     restart-condition: always
     plugs: [network, network-bind]
 
-  nextcloud-cron:
-    command: nextcloud-cron
-    daemon: simple
-    restart-condition: on-failure
-    plugs: [network, network-bind, removable-media]
-
-  # Command for manually installing instead of visiting site to create admin.
-  manual-install:
-    command: manual-install
-    plugs: [network, network-bind, removable-media]
-
-  import:
-    command: import-data
-    plugs: [network, network-bind, removable-media]
-
-  export:
-    command: export-data
-    plugs: [network, network-bind, removable-media]
-
-  # Service for automatically fixing Nextcloud indices, etc.
-  nextcloud-fixer:
-    command: nextcloud-fixer
-    daemon: simple
-    restart-condition: on-failure
-    plugs: [network, network-bind, removable-media]
-
 hooks:
   configure:
-    plugs: [network, network-bind, removable-media]
+    plugs: [network, network-bind]
   pre-refresh:
-    plugs: [network, network-bind, removable-media]
+    plugs: [network, network-bind]
 
 parts:
   apache:
     plugin: apache
-    source: http://ftp.wayne.edu/apache/httpd/httpd-2.4.41.tar.bz2
-    source-checksum: sha256/133d48298fe5315ae9366a0ec66282fa4040efa5d566174481077ade7d18ea40
+    source: http://ftp.wayne.edu/apache/httpd/httpd-2.4.43.tar.bz2
+    source-checksum: sha256/a497652ab3fc81318cdc2a203090a999150d86461acff97c1065dc910fe10f43
 
     override-pull: |
       snapcraftctl pull
-
       # For some reason, all directories in (and after) 2.4.32 are setgid.
       # Reported as https://bz.apache.org/bugzilla/show_bug.cgi?id=62298
       # Work around by unsetting setgid. FIXME: Remove when bug is fixed.
@@ -160,17 +113,10 @@ parts:
 
   nextcloud:
     plugin: dump
-    source: https://download.nextcloud.com/server/releases/nextcloud-17.0.5.tar.bz2
-    source-checksum: sha256/d503eaf998e652554a27c14382f2b42c307e7fc9d6afa05f2829b547eb733161
+    source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.1.tar.gz
     organize:
       '*': htdocs/
       '.htaccess': htdocs/.htaccess
-      '.user.ini': htdocs/.user.ini
-
-    # This snap automatically updates. No need to include the updater to nag
-    # users. This does not result in an integrity check failure.
-    prime:
-      - -htdocs/apps/updatenotification
 
   php:
     plugin: php
@@ -178,6 +124,7 @@ parts:
     source-checksum: sha256/b8072d526a283182963b03960b7982392daa43cb31131eca4cf0b996764a042e
     source-type: tar
     install-via: prefix
+    after: [apache]
     configflags:
       - --enable-fpm
       - --disable-cgi
@@ -199,6 +146,7 @@ parts:
       - --with-freetype-dir=/usr/lib
       - --disable-rpath
       - --enable-ftp
+      # - --with-apxs2=/usr/bin/apxs2
 
       # Enable ldap
       - --with-libdir=lib/$SNAPCRAFT_ARCH_TRIPLET
@@ -209,11 +157,12 @@ parts:
     stage-packages:
       # These are only included here until the OS snap stabilizes
       - libxml2
-      - libpng12-0
+      # - libpng-0
     build-packages:
+      - apache2
       - libxml2-dev
       - libcurl4-openssl-dev
-      - libpng12-dev
+      - libpng-dev
       - libjpeg9-dev
       - libbz2-dev
       - libmcrypt-dev
@@ -221,27 +170,13 @@ parts:
       - libfreetype6-dev
       - libgmp-dev
       - libzip-dev
+      - apache2-dev
     prime:
      - -sbin/
      - -etc/
     organize:
       # Put php-fpm in bin with everything else, not sbin.
       sbin/php-fpm: bin/php-fpm
-    extensions:
-      # Build the redis PHP module
-      - source: https://github.com/phpredis/phpredis/archive/5.1.1.tar.gz
-        source-checksum: sha256/6b054e1c944f0c415a3489cf6ac94d5423b2b506d8c36ac7a8cdd965a1c07cf9
-
-  redis:
-    plugin: redis
-    source: http://download.redis.io/releases/redis-5.0.8.tar.gz
-    source-checksum: sha256/f3c7eac42f433326a8d981b50dba0169fdfaf46abb23fcda2f933a7552ee4ed7
-
-  redis-customizations:
-    plugin: dump
-    source: src/redis/
-    organize:
-      config/*: config/redis/
 
   # Copy over our PHP configuration file.
   php-customizations:
@@ -348,11 +283,6 @@ parts:
     prime:
       - -*
 
-  mdns-publisher:
-    plugin: godeps
-    source: https://github.com/kyrofa/mdns-publisher.git
-    go-importpath: github.com/kyrofa/mdns-publisher
-
   delay-on-failure:
     plugin: dump
     source: src/delay-on-failure/
@@ -374,11 +304,6 @@ parts:
     source: src/https/
     stage-packages: [openssl]
     stage: [-etc/ssl, -requirements.txt]
-
-  import-export:
-    plugin: dump
-    source: src/import-export
-    stage-packages: [rsync]
 
   common:
     plugin: dump

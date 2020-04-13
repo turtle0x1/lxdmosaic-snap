@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# shellcheck source=src/nextcloud/utilities/nextcloud-utilities
 . "$SNAP/utilities/configuration-utilities"
 # shellcheck source=src/php/utilities/php-utilities
 . "$SNAP/utilities/php-utilities"

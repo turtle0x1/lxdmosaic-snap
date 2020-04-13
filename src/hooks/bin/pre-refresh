@@ -2,8 +2,6 @@
 
 # shellcheck source=src/apache/utilities/apache-utilities
 . "$SNAP/utilities/apache-utilities"
-# shellcheck source=src/nextcloud/utilities/nextcloud-utilities
-. "$SNAP/utilities/nextcloud-utilities"
 
 # By waiting for Apache we ensure that Nextcloud is setup and fully-updated
 wait_for_apache
@@ -12,10 +10,10 @@ wait_for_apache
 # of ensuring apps are updated properly and re-enabled after the update. Let's
 # help it out a little by trying to update all apps right now, before the
 # update actually happens.
-if nextcloud_is_installed; then
-	if occ -n app:update --all; then
-		# app:update downloads and extracts the updates, but now we
-		# need to run database migrations, etc.
-		occ -n upgrade
-	fi
-fi
+# if nextcloud_is_installed; then
+# 	if occ -n app:update --all; then
+# 		# app:update downloads and extracts the updates, but now we
+# 		# need to run database migrations, etc.
+# 		occ -n upgrade
+# 	fi
+# fi

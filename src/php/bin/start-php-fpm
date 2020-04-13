@@ -4,11 +4,7 @@
 . "$SNAP/utilities/mysql-utilities"
 # shellcheck source=src/php/utilities/php-utilities
 . "$SNAP/utilities/php-utilities"
-# shellcheck source=src/redis/utilities/redis-utilities
-. "$SNAP/utilities/redis-utilities"
-# shellcheck source=src/nextcloud/utilities/nextcloud-utilities
-. "$SNAP/utilities/nextcloud-utilities"
-# shellcheck source=src/nextcloud/utilities/nextcloud-utilities
+
 . "$SNAP/utilities/configuration-utilities"
 
 mkdir -p "${SNAP_DATA}/php"
