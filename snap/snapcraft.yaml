@@ -113,7 +113,7 @@ parts:
 
   nextcloud:
     plugin: dump
-    source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.1.tar.gz
+    source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.2.tar.gz
     after: [php]
     organize:
       '*': htdocs/
@@ -147,7 +147,7 @@ parts:
     configflags:
       - --enable-fpm
       - --disable-cgi
-      - --disable-phar
+#      - --disable-phar
       - --disable-phpdbg
       - --enable-ctype
       - --enable-mbstring
@@ -209,8 +209,7 @@ parts:
     plugin: dump
     source: src/nextcloud/
     organize:
-      config/: htdocs/config/
-    stage-packages: [jq]
+      config/.env: htdocs/.env
 
   # Download the boost headers for MySQL. Note that the version used may need to
   # be updated if the version of MySQL changes.

@@ -156,7 +156,7 @@ handle_self_signed()
 	done
 
 	printf "Generating key and self-signed certificate... "
-	if ! output="$(generate_self_signed_certificate 2>&1)"; then
+	if ! output="$(generate_self_signed_certificate)"; then
 		printf "error:\n" >&2
 		echo "$output" >&2
 		exit 1

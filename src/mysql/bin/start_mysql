@@ -43,6 +43,15 @@ if [ $new_install = true ]; then
 	# 3) Create the nextcloud database
 	# 4) Grant the nextcloud user privileges on the nextcloud database
 	printf "Setting up users and nextcloud database... "
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/users.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/seed.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.1.0.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.2.0.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.3.0.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.5.0.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.6.0.sql;
+	mysql --defaults-file="$root_option_file" < $SNAP/htdocs/sql/0.7.0.sql;
+
 	if mysql --defaults-file="$root_option_file" <<-SQL
 		ALTER USER 'root'@'localhost' IDENTIFIED BY '$root_password';
 		CREATE USER 'nextcloud'@'localhost' IDENTIFIED BY '$nextcloud_password';
