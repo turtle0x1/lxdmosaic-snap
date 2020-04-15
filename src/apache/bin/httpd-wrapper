@@ -22,7 +22,7 @@ if certificates_are_active; then
 		echo "Certificates appear self-signed: disabling HSTS"
 	fi
 else
-	echo "No certificates are active: using HTTP only"
+	generate_self_signed_certificate
 fi
 
 if debug_mode_enabled; then
