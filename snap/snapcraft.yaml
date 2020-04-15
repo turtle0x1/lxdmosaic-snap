@@ -54,6 +54,11 @@ apps:
     restart-condition: always
     plugs: [network, network-bind]
 
+  lxdmosaic-node:
+    command: node $SNAP/lxdmosaicNode/node/events.js
+    daemon: simple
+
+
 hooks:
   configure:
     plugs: [network, network-bind]
@@ -88,6 +93,10 @@ parts:
       - alias
       - ssl
       - socache_shmcb
+      - slotmem_shm
+      - proxy_wstunnel
+      - proxy_http
+      - proxy_balancer
 
     filesets:
       exclude:
@@ -111,6 +120,39 @@ parts:
     plugin: dump
     source: src/apache/
 
+  lxdmosaic-node:
+    plugin: nodejs
+    node-package-manager: npm
+    node-engine: "10.20.0"
+    node-packages: [node-gyp-build, utf-8-validate, bufferutil]
+    source: https://github.com/turtle0x1/LxdMosaic.git
+    source-commit: 7d6182b20c2e60cd1f09a6a8eeee89434cf44f09
+    organize: 
+      'LICENSE': 'madLadGoAway'
+    override-build: |
+      snapcraftctl build
+      echo "Moving from $(pwd) to $SNAPCRAFT_PART_INSTALL/api..."
+      mkdir -p $SNAPCRAFT_PART_INSTALL/lxdmosaicNode
+
+      mv .env.dist .env
+
+      sed -i "/CERT_PATH/c\CERT_PATH=\${SNAP_DATA}/certs/self-signed/cert.pem" .env
+      sed -i "/CERT_PRIVATE_KEY/c\CERT_PRIVATE_KEY=\${SNAP_DATA}/certs/self-signed/privkey.pem" .env
+
+      sed -i "/DB_HOST/c\DB_HOST=127.0.0.1" .env
+      sed -i "/DB_USER/c\DB_USER=lxd" .env
+      sed -i "/DB_PASS/c\DB_PASS=lxdManagerPasswordComplex321" .env
+      sed -i "/DB_NAME/c\DB_NAME=LXD_Manager" .env
+      sed -i "/LXD_CERTS_DIR/c\LXD_CERTS_DIR=\${SNAP_DATA}/" .env
+
+      cat .env
+      rm -rf LICENSE
+      mv .env $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/.env
+
+      mv * $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/
+
+
+
   nextcloud:
     plugin: dump
     source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.2.tar.gz
@@ -121,7 +163,6 @@ parts:
       - php-cli
       - php-zip
       - unzip
-      - nodejs
     override-pull: |
         snapcraftctl pull
         #Download composer
@@ -129,7 +170,6 @@ parts:
         ## Install it
         php composer-setup.php --install-dir=/usr/local/bin --filename=composer
         composer install --ignore-platform-reqs
-        npm i
 
         # Dont know - dont care (conflicts with mysql license file ?)
         mv LICENSE LXD_MOSAIC_LICENSE
