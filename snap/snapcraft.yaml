@@ -160,7 +160,8 @@ parts:
 
   nextcloud:
     plugin: dump
-    source: https://github.com/turtle0x1/LxdMosaic/archive/v0.7.2.tar.gz
+    source: https://github.com/turtle0x1/LxdMosaic.git
+    source-commit: ea84a669bb55ceb869907b2bc1c5c656ef10b4f0
     after: [php]
     organize:
       '*': htdocs/
