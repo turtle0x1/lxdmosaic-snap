@@ -153,8 +153,8 @@ parts:
       cat .env
       rm -rf LICENSE
       mv .env $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/.env
-
-      mv * $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/
+      mv node/ $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/
+      mv node_modules/ $SNAPCRAFT_PART_INSTALL/lxdmosaicNode/
 
 
 
