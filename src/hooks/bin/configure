@@ -78,7 +78,7 @@ handle_php_memory_limit()
 	php_set_previous_memory_limit "$memory_limit"
 
 	# Restart PHP to apply new config
-	snapctl restart nextcloud.php-fpm
+	snapctl restart lxdmosaic.php-fpm
 }
 
 handle_mode()
@@ -99,7 +99,7 @@ handle_mode()
 
 	# Restart all affected services. As of now that's Apache and PHP.
 	snapctl restart lxdmsosaic.apache
-	snapctl restart nextcloud.php-fpm
+	snapctl restart lxdmosaic.php-fpm
 }
 
 handle_apache_port_config && \

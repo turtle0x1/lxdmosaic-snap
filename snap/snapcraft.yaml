@@ -132,7 +132,7 @@ parts:
     node-packages: [node-gyp-build, utf-8-validate, bufferutil]
     source: https://github.com/turtle0x1/LxdMosaic.git
     source-commit: 7d6182b20c2e60cd1f09a6a8eeee89434cf44f09
-    organize: 
+    organize:
       'LICENSE': 'madLadGoAway'
     override-build: |
       snapcraftctl build
@@ -158,7 +158,7 @@ parts:
 
 
 
-  nextcloud:
+  lxdmosaic:
     plugin: dump
     source: https://github.com/turtle0x1/LxdMosaic.git
     source-commit: ea84a669bb55ceb869907b2bc1c5c656ef10b4f0
@@ -250,10 +250,10 @@ parts:
       config/*: config/php/
     stage-packages: [mawk]
 
-  # Copy over our Nextcloud configuration files
-  nextcloud-customizations:
+  # Copy over our LxdMosaic configuration files
+  lxdmosaic-customizations:
     plugin: dump
-    source: src/nextcloud/
+    source: src/lxdmosaic/
     organize:
       config/.env: htdocs/.env
 
