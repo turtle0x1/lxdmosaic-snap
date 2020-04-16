@@ -125,7 +125,7 @@ parts:
     node-engine: "10.20.0"
     node-packages: [node-gyp-build, utf-8-validate, bufferutil]
     source: https://github.com/turtle0x1/LxdMosaic.git
-    source-commit: 7d6182b20c2e60cd1f09a6a8eeee89434cf44f09
+    source-commit: 2f5a310dc9ec0b6d1966cb440600e7204a0b12fd
     organize:
       'LICENSE': 'madLadGoAway'
     override-build: |
