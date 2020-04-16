@@ -48,12 +48,6 @@ apps:
     command: disable-https
     plugs: [network, network-bind]
 
-  renew-certs:
-    command: renew-certs
-    daemon: simple
-    restart-condition: always
-    plugs: [network, network-bind]
-
   lxdmosaic-node:
     command: node $SNAP/lxdmosaicNode/node/events.js
     daemon: simple
@@ -349,18 +343,6 @@ parts:
   delay-on-failure:
     plugin: dump
     source: src/delay-on-failure/
-
-  certbot:
-    plugin: python
-    python-version: python2
-    source: src/https/
-    requirements: requirements.txt
-    build-packages: [libffi-dev]
-    after: [patches]
-    override-build: |
-      snapcraftctl build
-      patch -p1 -d $SNAPCRAFT_PART_INSTALL/lib/python2.7/site-packages/certbot < $SNAPCRAFT_STAGE/certbot-remove-default-config-files.patch
-      patch -p1 -d $SNAPCRAFT_PART_INSTALL/lib/python2.7/site-packages/certbot < $SNAPCRAFT_STAGE/certbot-remove-storage-chown.patch
 
   setup-https:
     plugin: dump
