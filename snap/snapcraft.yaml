@@ -51,12 +51,14 @@ apps:
   lxdmosaic-node:
     command: node $SNAP/lxdmosaicNode/node/events.js
     daemon: simple
+    plugs: [network, network-bind]
 
   lxdmosaic-cron:
     command: htdocs/src/cronJobs/fleetAnalytics.php
     daemon: oneshot
     passthrough:
       timer: 00:00-24:00/96
+    plugs: [network, network-bind]
 
 hooks:
   configure:
